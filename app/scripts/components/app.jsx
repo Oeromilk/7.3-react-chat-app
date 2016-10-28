@@ -4,7 +4,7 @@ var LayoutComponent = React.createClass({
   render: function(){
     return (
       <div>
-        <nav id="fixed-top" className="navbar navbar-default">
+        <nav className="navbar navbar-default">
           <div className="container-fluid">
             <div className="navbar-header">
               <div className="row">

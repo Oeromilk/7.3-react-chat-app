@@ -15,12 +15,12 @@ var LoginForm = React.createClass({
     this.setState({username: username});
   },
   handleSubmit: function(e){
-    e.preventDeafult();
+    e.preventDefault();
     var router = this.props.router;
 
     router.username = this.state.username;
     router.navigate('chat/', {trigger: true});
-    this.setState({username: ''});
+    //this.setState({username: ''});
   },
   render: function(){
     return (

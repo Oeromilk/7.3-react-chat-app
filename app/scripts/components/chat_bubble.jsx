@@ -17,9 +17,9 @@ var ChatForm = React.createClass({
     this.setState({content: message});
   },
   handleSubmit: function(e){
-
-    e.preventDeafult();
-    this.collection.create({content: this.state.content});
+    console.log(this);
+    e.preventDefault();
+    this.props.collection.create({content: this.state.content, username: this.props.username, time: new Date().getTime()});
     this.setState({content: ''});
   },
   render: function(){
@@ -39,23 +39,22 @@ var ChatForm = React.createClass({
 });
 
 var ChatListing = React.createClass({
-
-  getInitialState: function(){
-
-    return {
-      collection: this.state.collection
-    };
-  },
   render: function(){
 
-    var collection = this.state.collection;
+    var collection = this.props.collection;
     var messagesList = collection.map(function(content){
-      return <li key={content.get('_id') || content.cid}>{content.get('content')}</li>;
+      return (
+        <div className="well" key={content.get('_id') || content.cid}>
+          <h4 className="card-title">{content.get('username')}</h4>
+          <p className="card-text">{content.get('content')}</p>
+          <p className="card-text">sent at: {content.get('time')}</p>
+        </div>
+      );
     });
     return (
-      <ul>
+      <div className="card card-block">
         {messagesList}
-      </ul>
+      </div>
     );
   }
 });
@@ -69,29 +68,35 @@ var ChatComponent = React.createClass({
     };
   },
   componentWillMount: function(){
-    console.log(this.state.collection);
     var self = this;
     var collection = this.state.collection;
 
-    collection.fetch().then(function(){
-      self.setState({collection: collection});
-
-      collection.each(function(model){
+    setInterval(function(){
+      collection.fetch().then(function(){
+        self.setState({collection: collection});
+    });
+    collection.each(function(model){
         model.on('change', function(){self.update()});
       });
-    });
 
     collection.on('add', function(){self.update()});
+
+    }, 2000);
+
+
   },
   update: function(){
     this.forceUpdate();
+  },
+  componentWillunmount: function(){
+    clearInterval();
   },
   render: function(){
 
     return (
       <LayoutComponent>
-        <ChatListing />
-        <ChatForm />
+        <ChatListing collection={this.state.collection} username={this.props.username}/>
+        <ChatForm collection={this.state.collection} username={this.props.username}/>
       </LayoutComponent>
     )
   }
